@@ -51,6 +51,7 @@ const DashboardPage = () => {
             <h2>Welcome to your Dashboard</h2>
             <p>Click below to view the products:</p>
             <Link to="/products">Go to Products</Link>
+            <Link to="/categories">Go to Categories</Link>
             {userData ? (
                 <div>
                     <h3>User Info:</h3>
