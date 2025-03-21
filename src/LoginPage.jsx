@@ -14,7 +14,6 @@ const Login = () => {
 
         // Get the base URL from the environment variable
         const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-
         try {
             const response = await axios.post(`${apiBaseUrl}/auth/login`, {
                 email,
@@ -22,7 +21,6 @@ const Login = () => {
             });
             // Assuming the response contains the token
             const { access_token } = response.data;
-
             if (access_token) {
                 // Save the token to localStorage
                 localStorage.setItem('authToken', access_token);
@@ -33,7 +31,7 @@ const Login = () => {
                 // Redirect to dashboard after 2 seconds
                 setTimeout(() => {
                     navigate('/dashboard');
-                }, 2000); // You can adjust the time as needed
+                }, 200); // You can adjust the time as needed
             }
         } catch (error) {
             // Show error toast
