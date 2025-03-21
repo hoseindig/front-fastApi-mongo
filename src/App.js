@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import DashboardPage from "./DashboardPage";
+import ProductPage from "./ProductPage";
 
 const App = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const App = () => {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/products" element={<ProductPage />} /> {/* Add the route */}
       <Route path="/" element={<h1>Welcome to the app!</h1>} />
     </Routes>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const DashboardPage = () => {
     const [userData, setUserData] = useState(null);
@@ -48,6 +49,8 @@ const DashboardPage = () => {
     return (
         <div className="dashboard-container">
             <h2>Welcome to your Dashboard</h2>
+            <p>Click below to view the products:</p>
+            <Link to="/products">Go to Products</Link>
             {userData ? (
                 <div>
                     <h3>User Info:</h3>
