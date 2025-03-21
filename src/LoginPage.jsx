@@ -64,9 +64,6 @@ const Login = () => {
                 </div>
                 <button type="submit">Login</button>
             </form>
-
-            {/* ToastContainer will render the toast notifications */}
-            <ToastContainer />
         </div>
     );
 };

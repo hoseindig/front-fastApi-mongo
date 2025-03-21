@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AddProductPage = () => {
     const [name, setName] = useState('');
@@ -16,7 +17,9 @@ const AddProductPage = () => {
 
         try {
             await axios.post(`${process.env.REACT_APP_API_BASE_URL}/products/`, newProduct);
+            toast.success('Add Product successful! ');
             navigate('/products'); // Redirect to products page after successful submission
+            // Show success toast
         } catch (error) {
             console.error('Error adding product:', error);
         }

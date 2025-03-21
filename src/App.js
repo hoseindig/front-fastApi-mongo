@@ -5,10 +5,13 @@ import Dashboard from "./DashboardPage";
 import ProductPage from "./ProductPage";
 import AddProductPage from "./AddProductPage";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
     <div>
+      <ToastContainer />
+
       <Routes>
         {/* Homepage with a link to products */}
         <Route
