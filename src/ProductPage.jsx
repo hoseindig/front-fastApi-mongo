@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [categories, setCategories] = useState([]);  // List of categories
 
     // Fetch products from API (simulated here)
     useEffect(() => {
@@ -34,6 +35,17 @@ const ProductPage = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/category/`);
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchCategories();
+
         fetchProducts();
     }, []);
 
@@ -57,7 +69,7 @@ const ProductPage = () => {
                             <li key={product.id}>
                                 <h3> Name: {product.name}</h3>
                                 <p> Description: {product.description}</p>
-                                <p> Category: {product.category}</p>
+                                <p> Category: {categories.find(x => x.id === product.category_id)?.name}</p>
                                 <p> Price: ${product.price}</p>
                                 {product.image_id ? (
                                     <img
