@@ -144,25 +144,28 @@ const AddProductPage = () => {
                         ))}
                     </select>
                 </div>
+                <div>
+                    <input type="file" onChange={handleFileChange} />
+                    <button onClick={uploadFile}>Upload</button>
+                    {fileId && <p>File ID: {fileId}</p>}
+                </div>
+                {fileId ? (
+                    <img
+                        src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${fileId}.jpg`}
+                        alt="Product"
+                        width="200"
+                        onError={(e) => { e.target.src = "/noimage.png"; }} // Fallback image in case of an error
+                    />
+                ) : (
+
+                    <p>No Image
+                    </p>
+                )}
 
                 <button type="submit">Add Product</button>
             </form>
 
-            <div>
-                <input type="file" onChange={handleFileChange} />
-                <button onClick={uploadFile}>Upload</button>
-                {fileId && <p>File ID: {fileId}</p>}
-            </div>
-            {fileId ? (
-                <img
-                    src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${fileId}.jpg`}
-                    alt="Product"
-                    width="200"
-                    onError={(e) => { e.target.src = "/fallback-image.jpg"; }} // Fallback image in case of an error
-                />
-            ) : (
-                <p>No Image</p>
-            )}
+
         </div>
     );
 };
