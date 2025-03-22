@@ -61,7 +61,7 @@ const ProductPage = () => {
                                 <p> Price: ${product.price}</p>
                                 {product.image_id ? (
                                     <img
-                                        src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${product.image_id}.jpg`}
+                                        src={`${process.env.REACT_APP_API_BASE_URL}${product.image_id}`}
                                         alt="Product"
                                         width="50"
                                         onError={(e) => { e.target.src = "/noimage.png"; }} // Fallback image in case of an error

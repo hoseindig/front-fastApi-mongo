@@ -36,7 +36,7 @@ const AddProductPage = () => {
 
             const data = await response.json();
             if (response.ok) {
-                setFileId(data.file_id);
+                setFileId(data.file_url);
                 toast.success("File uploaded successfully!");
             } else {
                 toast.error("Upload failed: " + data.detail);
@@ -144,28 +144,28 @@ const AddProductPage = () => {
                         ))}
                     </select>
                 </div>
-                <div>
-                    <input type="file" onChange={handleFileChange} />
-                    <button onClick={uploadFile}>Upload</button>
-                    {fileId && <p>File ID: {fileId}</p>}
-                </div>
-                {fileId ? (
-                    <img
-                        src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${fileId}.jpg`}
-                        alt="Product"
-                        width="200"
-                        onError={(e) => { e.target.src = "/noimage.png"; }} // Fallback image in case of an error
-                    />
-                ) : (
-
-                    <p>No Image
-                    </p>
-                )}
 
                 <button type="submit">Add Product</button>
             </form>
 
+            <div>
+                <input type="file" onChange={handleFileChange} />
+                <button onClick={uploadFile}>Upload</button>
+                {fileId && <p>File ID: {fileId}</p>}
+            </div>
+            {/* {fileId} */}
+            {fileId ? (
+                <img
+                    src={`${process.env.REACT_APP_API_BASE_URL}${fileId}`}
+                    alt="Product"
+                    width="200"
+                    onError={(e) => { e.target.src = "/noimage.png"; }} // Fallback image in case of an error
+                />
+            ) : (
 
+                <p>No Image
+                </p>
+            )}
         </div>
     );
 };
