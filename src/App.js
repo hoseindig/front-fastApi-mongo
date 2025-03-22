@@ -75,6 +75,11 @@ const App = () => {
           element={<ProtectedRoute element={<AddProductPage />} />}
         />
         <Route
+          path="/add-product/:productId?"
+          element={<ProtectedRoute element={<AddProductPage />} />}
+        />
+
+        <Route
           path="/categories"
           element={<ProtectedRoute element={<CategoryPage />} />}
         />

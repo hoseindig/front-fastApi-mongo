@@ -1,37 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [categories, setCategories] = useState([]);  // List of categories
+    const [categories, setCategories] = useState([]);
+    const navigate = useNavigate();
 
-    // Fetch products from API (simulated here)
     useEffect(() => {
-        const fetchProducts = async () => {
-            const token = localStorage.getItem("authToken"); // Get the token from localStorage
-            if (!token) {
-                // Redirect to login if no token
-                window.location.href = "/login";
-                return;
-            }
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
 
+        const fetchProducts = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/products/`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 setProducts(response.data);
-                setLoading(false);
             } catch (error) {
                 console.error("Error fetching products:", error);
-                setLoading(false);
-                // Handle unauthorized access (401 error)
-                if (error.response && error.response.status === 401) {
-                    window.location.href = "/login"; // Redirect to login page
+                if (error.response?.status === 401) {
+                    window.location.href = "/login";
                 }
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -45,42 +42,61 @@ const ProductPage = () => {
         };
 
         fetchCategories();
-
         fetchProducts();
     }, []);
 
-    if (loading) {
-        return <div>Loading products...</div>;
-    }
+    const handleDelete = async (id) => {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
+        if (window.confirm("Are you sure you want to delete this product?")) {
+            try {
+                await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                toast.success("Product deleted successfully!");
+                setProducts(products.filter(product => product.id !== id)); // Remove from UI
+            } catch (error) {
+                console.error("Error deleting product:", error);
+                toast.error("Failed to delete product.");
+            }
+        }
+    };
+
+    if (loading) return <div>Loading products...</div>;
 
     return (
         <div>
             <h1>Product List</h1>
+            <Link to="/add-product">➕ Add New Product</Link>
             <div>
                 {products.length === 0 ? (
-                    <>
-                        <p>No products available</p>
-                        <li><Link to="/add-product">Add New</Link></li>
-                    </>
+                    <p>No products available</p>
                 ) : (
                     <ul>
-                        <li><Link to="/add-product">Add New</Link></li>
                         {products.map((product) => (
                             <li key={product.id}>
-                                <h3> Name: {product.name}</h3>
-                                <p> Description: {product.description}</p>
-                                <p> Category: {categories.find(x => x.id === product.category_id)?.name}</p>
-                                <p> Price: ${product.price}</p>
+                                <h3>{product.name}</h3>
+                                <p>{product.description}</p>
+                                <p>Category: {categories.find(x => x.id === product.category_id)?.name || 'N/A'}</p>
+                                <p>Price: ${product.price}</p>
                                 {product.image_id ? (
                                     <img
                                         src={`${process.env.REACT_APP_API_BASE_URL}${product.image_id}`}
                                         alt="Product"
                                         width="50"
-                                        onError={(e) => { e.target.src = "/noimage.png"; }} // Fallback image in case of an error
+                                        onError={(e) => { e.target.src = "/noimage.png"; }}
                                     />
                                 ) : (
                                     <p>No Image</p>
                                 )}
+                                <p>
+                                    <Link to={`/add-product/${product.id}`} style={{ marginRight: "10px" }}>✏️ Edit</Link>
+                                    <button onClick={() => handleDelete(product.id)}>🗑️ Delete</button>
+                                </p>
                             </li>
                         ))}
                     </ul>
