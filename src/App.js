@@ -1,27 +1,60 @@
-import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import Login from "./LoginPage";
 import Dashboard from "./DashboardPage";
 import ProductPage from "./ProductPage";
 import AddProductPage from "./AddProductPage";
-import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute
-import CategoryPage from "./CategoryPage"; // Import the CategoryPage
-import AddCategoryPage from "./AddCategoryPage"; // Import AddCategoryPage
+import ProtectedRoute from "./ProtectedRoute";
+import CategoryPage from "./CategoryPage";
+import AddCategoryPage from "./AddCategoryPage";
 import { ToastContainer } from "react-toastify";
+import axios from "axios";
 
 const App = () => {
+  const location = useLocation(); // Get the current route
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    // If no token and not on the login page, redirect to login
+    if (!token && location.pathname !== "/login") {
+      window.location.href = "/login";
+      return;
+    }
+
+    // Fetch user data if token exists
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/auth/me`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUser(response.data); // Store user data
+      } catch (err) {
+        console.error("Error fetching user:", err);
+        if (err.response?.status === 401) {
+          localStorage.removeItem("authToken");
+          window.location.href = "/login"; // Redirect on unauthorized access
+        }
+      }
+    };
+
+    if (token) fetchUserData();
+  }, [location.pathname]); // Re-run when the route changes
+
   return (
     <div>
       <ToastContainer />
 
       <Routes>
-        {/* Homepage with a link to products */}
         <Route
           path="/"
           element={
             <div>
               <h1>Welcome to the app!</h1>
-              {/* Add a Link to the products page */}
               <p>
                 <Link to="/products">Go to Product Page</Link>
               </p>
@@ -31,12 +64,8 @@ const App = () => {
             </div>
           }
         />
-
-        {/* Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* Protect product routes */}
         <Route
           path="/products"
           element={<ProtectedRoute element={<ProductPage />} />}
@@ -45,7 +74,6 @@ const App = () => {
           path="/add-product"
           element={<ProtectedRoute element={<AddProductPage />} />}
         />
-        {/* Category routes */}
         <Route
           path="/categories"
           element={<ProtectedRoute element={<CategoryPage />} />}

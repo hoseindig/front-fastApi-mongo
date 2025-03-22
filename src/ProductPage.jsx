@@ -9,13 +9,28 @@ const ProductPage = () => {
     // Fetch products from API (simulated here)
     useEffect(() => {
         const fetchProducts = async () => {
+            const token = localStorage.getItem("authToken"); // Get the token from localStorage
+            if (!token) {
+                // Redirect to login if no token
+                window.location.href = "/login";
+                return;
+            }
+
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/products/`);
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/products/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                    },
+                });
                 setProducts(response.data);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching products:", error);
                 setLoading(false);
+                // Handle unauthorized access (401 error)
+                if (error.response && error.response.status === 401) {
+                    window.location.href = "/login"; // Redirect to login page
+                }
             }
         };
 
@@ -40,10 +55,20 @@ const ProductPage = () => {
                         <li><Link to="/add-product">Add New</Link></li>
                         {products.map((product) => (
                             <li key={product.id}>
-                                <h3> name :{product.name}</h3>
-                                <p> description :{product.description}</p>
-                                <p> category :{product.category}</p>
-                                <p>Price: ${product.price}</p>
+                                <h3> Name: {product.name}</h3>
+                                <p> Description: {product.description}</p>
+                                <p> Category: {product.category}</p>
+                                <p> Price: ${product.price}</p>
+                                {product.image_id ? (
+                                    <img
+                                        src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${product.image_id}.jpg`}
+                                        alt="Product"
+                                        width="50"
+                                        onError={(e) => { e.target.src = "/fallback-image.jpg"; }} // Fallback image in case of an error
+                                    />
+                                ) : (
+                                    <p>No Image</p>
+                                )}
                             </li>
                         ))}
                     </ul>

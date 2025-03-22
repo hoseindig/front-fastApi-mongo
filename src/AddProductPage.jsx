@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -10,13 +10,15 @@ const AddProductPage = () => {
     const [category_id, setCategory] = useState('');  // Store selected category ID
     const [categories, setCategories] = useState([]);  // List of categories
     const [file, setFile] = useState(null);
-    const [fileId, setFileId] = useState("");
+    const [fileId, setFileId] = useState('');
     const navigate = useNavigate();
 
+    // Handle file change
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
 
+    // Upload file function
     const uploadFile = async () => {
         if (!file) {
             alert("Please select a file");
@@ -45,15 +47,28 @@ const AddProductPage = () => {
         }
     };
 
-
     // Handle product submission
     const handleAddProduct = async (e) => {
         e.preventDefault();
 
-        const newProduct = { name, description, price, category_id }; // Send category ID
+        const newProduct = { name, description, price, category_id, image_id: fileId };
+
+        const token = localStorage.getItem("authToken"); // Get token from localStorage
+        if (!token) {
+            window.location.href = "/login"; // Redirect to login if no token
+            return;
+        }
 
         try {
-            await axios.post(`${process.env.REACT_APP_API_BASE_URL}/products/`, newProduct);
+            await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/products/`,
+                newProduct,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                    },
+                }
+            );
             toast.success('Product added successfully!');
             navigate('/products');  // Redirect to products page
         } catch (error) {
@@ -61,8 +76,6 @@ const AddProductPage = () => {
             toast.error('Failed to add product.');
         }
     };
-
-
 
     // Fetch categories when the component mounts
     useEffect(() => {
@@ -134,6 +147,7 @@ const AddProductPage = () => {
 
                 <button type="submit">Add Product</button>
             </form>
+
             <div>
                 <input type="file" onChange={handleFileChange} />
                 <button onClick={uploadFile}>Upload</button>
