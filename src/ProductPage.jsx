@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
     // Fetch products from API (simulated here)
     useEffect(() => {
         const fetchProducts = async () => {
@@ -17,6 +18,7 @@ const ProductPage = () => {
                 setLoading(false);
             }
         };
+
         fetchProducts();
     }, []);
 
@@ -29,7 +31,10 @@ const ProductPage = () => {
             <h1>Product List</h1>
             <div>
                 {products.length === 0 ? (
-                    <p>No products available</p>
+                    <>
+                        <p>No products available</p>
+                        <li><Link to="/add-product">Add New</Link></li>
+                    </>
                 ) : (
                     <ul>
                         <li><Link to="/add-product">Add New</Link></li>

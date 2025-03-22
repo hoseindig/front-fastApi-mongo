@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -7,23 +7,40 @@ const AddProductPage = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
-    const [category, setCategory] = useState('');  // New state for category
+    const [category_id, setCategory] = useState('');  // Store selected category ID
+    const [categories, setCategories] = useState([]);  // List of categories
+
     const navigate = useNavigate();
 
+    // Handle product submission
     const handleAddProduct = async (e) => {
         e.preventDefault();
 
-        const newProduct = { name, description, price, category };  // Include category in the new product data
+        const newProduct = { name, description, price, category_id }; // Send category ID
 
         try {
             await axios.post(`${process.env.REACT_APP_API_BASE_URL}/products/`, newProduct);
-            toast.success('Add Product successful! ');
-            navigate('/products'); // Redirect to products page after successful submission
-            // Show success toast
+            toast.success('Product added successfully!');
+            navigate('/products');  // Redirect to products page
         } catch (error) {
             console.error('Error adding product:', error);
+            toast.error('Failed to add product.');
         }
     };
+
+    // Fetch categories when the component mounts
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/category/`);
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     return (
         <div>
@@ -61,16 +78,22 @@ const AddProductPage = () => {
                     />
                 </div>
 
-                {/* New category input */}
+                {/* Category dropdown */}
                 <div>
                     <label htmlFor="category">Category:</label>
-                    <input
-                        type="text"
+                    <select
                         id="category"
-                        value={category}
+                        value={category_id}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                    />
+                    >
+                        <option value="">Select a category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <button type="submit">Add Product</button>
