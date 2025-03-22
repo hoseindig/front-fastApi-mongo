@@ -9,8 +9,42 @@ const AddProductPage = () => {
     const [price, setPrice] = useState('');
     const [category_id, setCategory] = useState('');  // Store selected category ID
     const [categories, setCategories] = useState([]);  // List of categories
-
+    const [file, setFile] = useState(null);
+    const [fileId, setFileId] = useState("");
     const navigate = useNavigate();
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
+    const uploadFile = async () => {
+        if (!file) {
+            alert("Please select a file");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/files/upload/`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setFileId(data.file_id);
+                toast.success("File uploaded successfully!");
+            } else {
+                toast.error("Upload failed: " + data.detail);
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            toast.error("Error uploading file");
+        }
+    };
+
 
     // Handle product submission
     const handleAddProduct = async (e) => {
@@ -27,6 +61,8 @@ const AddProductPage = () => {
             toast.error('Failed to add product.');
         }
     };
+
+
 
     // Fetch categories when the component mounts
     useEffect(() => {
@@ -98,6 +134,21 @@ const AddProductPage = () => {
 
                 <button type="submit">Add Product</button>
             </form>
+            <div>
+                <input type="file" onChange={handleFileChange} />
+                <button onClick={uploadFile}>Upload</button>
+                {fileId && <p>File ID: {fileId}</p>}
+            </div>
+            {fileId ? (
+                <img
+                    src={`${process.env.REACT_APP_API_BASE_URL}/files/image/${fileId}.jpg`}
+                    alt="Product"
+                    width="200"
+                    onError={(e) => { e.target.src = "/fallback-image.jpg"; }} // Fallback image in case of an error
+                />
+            ) : (
+                <p>No Image</p>
+            )}
         </div>
     );
 };
