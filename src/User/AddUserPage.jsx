@@ -6,10 +6,15 @@ import { toast } from "react-toastify";
 const AddUserPage = () => {
   const { userId } = useParams(); // Get user ID from the URL (if editing)
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [family, setFamily] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [role, setRole] = useState("user"); // Default role
+  const [file, setFile] = useState(null);
+  const [profile_image, setProfile_image] = useState(null);
+  const [fileId, setFileId] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +39,7 @@ const AddUserPage = () => {
           setEmail(user.email);
           setMobile(user.mobile);
           setRole(user.role);
+          setProfile_image(user.profile_image);
         } catch (error) {
           console.error("Error fetching user:", error);
           toast.error("Failed to fetch user data.");
@@ -42,6 +48,37 @@ const AddUserPage = () => {
     };
     if (userId) fetchUser();
   }, [userId]);
+
+  const uploadFile = async () => {
+    if (!file) {
+      toast.error("Please select a file");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/files/upload/`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setFileId(data.file_url);
+        toast.success("File uploaded successfully!");
+      } else {
+        toast.error("Upload failed: " + data.detail);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Error uploading file");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,6 +94,8 @@ const AddUserPage = () => {
       email,
       mobile,
       role,
+      password,
+      profile_image: fileId,
     };
 
     try {
@@ -86,9 +125,28 @@ const AddUserPage = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   return (
     <div>
-      <h1>{userId ? "Edit User" : "Add New User"}</h1>
+      <h1>
+        {userId ? "Edit User" : "Add New User"}
+        {profile_image ? (
+          <img
+            src={`${process.env.REACT_APP_API_BASE_URL}${profile_image}`}
+            alt="Product"
+            width="50"
+            style={{ borderRadius: "50%", width: "20px", height: "20px" }}
+            onError={(e) => {
+              e.target.src = "/noimage.png";
+            }}
+          />
+        ) : (
+          <p>No Image</p>
+        )}
+      </h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name">First Name:</label>
@@ -133,7 +191,16 @@ const AddUserPage = () => {
             required
           />
         </div>
-
+        <div>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="text"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
         <div>
           <label htmlFor="role">Role:</label>
           <select
@@ -149,6 +216,25 @@ const AddUserPage = () => {
 
         <button type="submit">{userId ? "Update User" : "Add User"}</button>
       </form>
+
+      <div>
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={uploadFile}>Upload</button>
+        {fileId && <p>File ID: {fileId}</p>}
+      </div>
+
+      {fileId ? (
+        <img
+          src={`${process.env.REACT_APP_API_BASE_URL}${fileId}`}
+          alt="Product"
+          width="200"
+          onError={(e) => {
+            e.target.src = "/noimage.png";
+          }}
+        />
+      ) : (
+        <p>No Image</p>
+      )}
     </div>
   );
 };

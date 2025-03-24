@@ -92,9 +92,9 @@ const UserPage = () => {
                 </h3>
                 <p>mobile: {product.mobile}</p>
                 <p>email: {product.email}</p>
-                {product.image_id ? (
+                {product.profile_image ? (
                   <img
-                    src={`${process.env.REACT_APP_API_BASE_URL}${product.image_id}`}
+                    src={`${process.env.REACT_APP_API_BASE_URL}${product.profile_image}`}
                     alt="Product"
                     width="50"
                     onError={(e) => {
