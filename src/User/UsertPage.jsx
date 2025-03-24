@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Button,
   Box,
+  Chip, // ✅ Import Chip
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -72,8 +73,20 @@ const UserPage = () => {
       } catch (error) {
         const detail = error?.response?.data?.detail;
         console.error("Error deleting user:", error?.response?.data?.detail);
-        toast.error(detail ? detail : "Failed to delete user. ");
+        toast.error(detail ? detail : "Failed to delete user.");
       }
+    }
+  };
+
+  const getRoleColor = (role) => {
+    switch (role) {
+      case "super_admin":
+        return "error"; // Red
+      case "admin":
+        return "primary"; // Blue
+      case "user":
+      default:
+        return "success"; // Green
     }
   };
 
@@ -109,7 +122,7 @@ const UserPage = () => {
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={6} align="center">
                   No users available
                 </TableCell>
               </TableRow>
@@ -130,7 +143,12 @@ const UserPage = () => {
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.mobile}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.role.toUpperCase()}
+                      color={getRoleColor(user.role)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
                       <IconButton
@@ -140,12 +158,14 @@ const UserPage = () => {
                       >
                         <Edit />
                       </IconButton>
-                      <IconButton
-                        onClick={() => handleDelete(user.id)}
-                        color="error"
-                      >
-                        <Delete />
-                      </IconButton>
+                      {user.role !== "super_admin" && (
+                        <IconButton
+                          onClick={() => handleDelete(user.id)}
+                          color="error"
+                        >
+                          <Delete />
+                        </IconButton>
+                      )}
                     </Box>
                   </TableCell>
                 </TableRow>
