@@ -10,13 +10,17 @@ import {
   ListItemText,
   CssBaseline,
   Box,
-  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
 } from "@mui/material";
 import {
   Dashboard,
   ShoppingCart,
   People,
   ExitToApp,
+  AccountCircle,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -25,6 +29,7 @@ const drawerWidth = 240;
 
 const AdminLayout = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,6 +60,14 @@ const AdminLayout = ({ children }) => {
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     navigate("/login");
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -111,17 +124,42 @@ const AdminLayout = ({ children }) => {
         >
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6">Admin Panel</Typography>
+
+            {/* User Dropdown Menu */}
             {user && (
-              <Typography variant="body1">
-                Logged in as: <strong>{user.name}</strong> ({user.email})
-                <Button
-                  color="inherit"
-                  onClick={handleLogout}
-                  sx={{ marginLeft: 2 }}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography variant="body1" sx={{ marginRight: 1 }}>
+                  {user.name}
+                </Typography>
+                <IconButton onClick={handleMenuOpen} color="inherit">
+                  <Avatar
+                    sx={{ bgcolor: "white", color: "#3f51b5" }}
+                    src={
+                      `${process.env.REACT_APP_API_BASE_URL}${user.profile_image}` ||
+                      ""
+                    }
+                  >
+                    {!user.profile_image && user.name.charAt(0)}
+                  </Avatar>
+                </IconButton>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
                 >
-                  Logout
-                </Button>
-              </Typography>
+                  <MenuItem
+                    component={Link}
+                    to={`/add-user/${user.id}`}
+                    onClick={handleMenuClose}
+                  >
+                    <AccountCircle sx={{ marginRight: 1 }} /> Profile
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>
+                    <ExitToApp sx={{ marginRight: 1 }} /> Logout
+                  </MenuItem>
+                </Menu>
+              </Box>
             )}
           </Toolbar>
         </AppBar>
