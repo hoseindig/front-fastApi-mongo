@@ -64,7 +64,7 @@ const App = () => {
                 <Link to="/categories">Go to Categories</Link>
               </p>
               <p>
-                <Link to="/user">Go to User</Link>
+                <Link to="/users">Go to User</Link>
               </p>
             </div>
           }
