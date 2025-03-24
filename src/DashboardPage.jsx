@@ -67,6 +67,7 @@ const DashboardPage = () => {
           <h3>User Info:</h3>
           <p>Name: {userData.name}</p>
           <p>Email: {userData.email}</p>
+          <p>Role: {userData.role}</p>
           {/* You can display more user data here */}
         </div>
       ) : (
