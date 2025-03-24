@@ -70,8 +70,9 @@ const UserPage = () => {
         toast.success("User deleted successfully!");
         setUsers(users.filter((user) => user.id !== id));
       } catch (error) {
-        console.error("Error deleting user:", error);
-        toast.error("Failed to delete user.");
+        const detail = error?.response?.data?.detail;
+        console.error("Error deleting user:", error?.response?.data?.detail);
+        toast.error(detail ? detail : "Failed to delete user. ");
       }
     }
   };
@@ -101,6 +102,7 @@ const UserPage = () => {
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Mobile</TableCell>
+              <TableCell>Role</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -128,6 +130,7 @@ const UserPage = () => {
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.mobile}</TableCell>
+                  <TableCell>{user.role}</TableCell>
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
                       <IconButton
