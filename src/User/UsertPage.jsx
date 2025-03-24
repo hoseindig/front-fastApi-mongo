@@ -1,15 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
-
+import {
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Avatar,
+  CircularProgress,
+  Button,
+  Box,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const UserPage = () => {
-  const [products, setProducts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -18,7 +30,7 @@ const UserPage = () => {
       return;
     }
 
-    const fetchProducts = async () => {
+    const fetchUsers = async () => {
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/users/`,
@@ -26,9 +38,9 @@ const UserPage = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setProducts(response.data);
+        setUsers(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching users:", error);
         if (error.response?.status === 401) {
           window.location.href = "/login";
         }
@@ -37,19 +49,7 @@ const UserPage = () => {
       }
     };
 
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/category/`
-        );
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-    fetchProducts();
+    fetchUsers();
   }, []);
 
   const handleDelete = async (id) => {
@@ -59,69 +59,98 @@ const UserPage = () => {
       return;
     }
 
-    if (window.confirm("Are you sure you want to delete this product?")) {
+    if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await axios.delete(
-          `${process.env.REACT_APP_API_BASE_URL}/products/${id}`,
+          `${process.env.REACT_APP_API_BASE_URL}/users/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        toast.success("Product deleted successfully!");
-        setProducts(products.filter((product) => product.id !== id)); // Remove from UI
+        toast.success("User deleted successfully!");
+        setUsers(users.filter((user) => user.id !== id));
       } catch (error) {
-        console.error("Error deleting product:", error);
-        toast.error("Failed to delete product.");
+        console.error("Error deleting user:", error);
+        toast.error("Failed to delete user.");
       }
     }
   };
 
-  if (loading) return <div>Loading users...</div>;
+  if (loading) return <CircularProgress />;
 
   return (
     <div>
-      <Typography variant="h4">Users</Typography>
-      <Link to="/add-user">➕ Add New Users</Link>
-      <div>
-        {products.length === 0 ? (
-          <p>No products available</p>
-        ) : (
-          <ul>
-            {products.map((product) => (
-              <li key={product.id}>
-                <h3>
-                  {product.name} {product.family}
-                </h3>
-                <p>mobile: {product.mobile}</p>
-                <p>email: {product.email}</p>
-                {product.profile_image ? (
-                  <img
-                    src={`${process.env.REACT_APP_API_BASE_URL}${product.profile_image}`}
-                    alt="Product"
-                    width="50"
-                    onError={(e) => {
-                      e.target.src = "/noimage.png";
-                    }}
-                  />
-                ) : (
-                  <p>No Image</p>
-                )}
-                <p>
-                  <Link
-                    to={`/add-user/${product.id}`}
-                    style={{ marginRight: "10px" }}
-                  >
-                    ✏️ Edit
-                  </Link>
-                  <button onClick={() => handleDelete(product.id)}>
-                    🗑️ Delete
-                  </button>
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Typography variant="h4" gutterBottom>
+        Users
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/add-user"
+        sx={{ mb: 2 }}
+      >
+        ➕ Add New User
+      </Button>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Profile</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Mobile</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No users available
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <Avatar
+                      src={`${process.env.REACT_APP_API_BASE_URL}${user.profile_image}`}
+                      alt={user.name}
+                      onError={(e) => {
+                        e.target.src = "/noimage.png";
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {user.name} {user.family}
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.mobile}</TableCell>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <IconButton
+                        component={Link}
+                        to={`/add-user/${user.id}`}
+                        color="primary"
+                      >
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDelete(user.id)}
+                        color="error"
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

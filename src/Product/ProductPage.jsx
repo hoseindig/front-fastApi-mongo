@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
-import axios from "axios";
+import {
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Box,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { toast } from "react-toastify";
 
 const ProductPage = () => {
@@ -21,9 +33,7 @@ const ProductPage = () => {
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/products/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setProducts(response.data);
       } catch (error) {
@@ -62,12 +72,10 @@ const ProductPage = () => {
       try {
         await axios.delete(
           `${process.env.REACT_APP_API_BASE_URL}/products/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         toast.success("Product deleted successfully!");
-        setProducts(products.filter((product) => product.id !== id)); // Remove from UI
+        setProducts(products.filter((product) => product.id !== id));
       } catch (error) {
         console.error("Error deleting product:", error);
         toast.error("Failed to delete product.");
@@ -79,51 +87,87 @@ const ProductPage = () => {
 
   return (
     <div>
-      <Typography variant="h4">Products</Typography>
+      <Typography variant="h4" gutterBottom>
+        Products
+      </Typography>
       <Link to="/add-product">➕ Add New Product</Link>
-      <div>
-        {products.length === 0 ? (
-          <p>No products available</p>
-        ) : (
-          <ul>
-            {products.map((product) => (
-              <li key={product.id}>
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <p>
-                  Category:{" "}
-                  {categories.find((x) => x.id === product.category_id)?.name ||
-                    "N/A"}
-                </p>
-                <p>Price: ${product.price}</p>
-                {product.image_id ? (
-                  <img
-                    src={`${process.env.REACT_APP_API_BASE_URL}${product.image_id}`}
-                    alt="Product"
-                    width="50"
-                    onError={(e) => {
-                      e.target.src = "/noimage.png";
-                    }}
-                  />
-                ) : (
-                  <p>No Image</p>
-                )}
-                <p>
-                  <Link
-                    to={`/add-product/${product.id}`}
-                    style={{ marginRight: "10px" }}
-                  >
-                    ✏️ Edit
-                  </Link>
-                  <button onClick={() => handleDelete(product.id)}>
-                    🗑️ Delete
-                  </button>
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <b>Name</b>
+              </TableCell>
+              <TableCell>
+                <b>Description</b>
+              </TableCell>
+              <TableCell>
+                <b>Category</b>
+              </TableCell>
+              <TableCell>
+                <b>Price</b>
+              </TableCell>
+              <TableCell>
+                <b>Image</b>
+              </TableCell>
+              <TableCell>
+                <b>Actions</b>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  No products available
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>
+                    {categories.find((x) => x.id === product.category_id)
+                      ?.name || "N/A"}
+                  </TableCell>
+                  <TableCell>${product.price}</TableCell>
+                  <TableCell>
+                    {product.image_id ? (
+                      <img
+                        src={`${process.env.REACT_APP_API_BASE_URL}${product.image_id}`}
+                        alt="Product"
+                        width="50"
+                        onError={(e) => (e.target.src = "/noimage.png")}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <IconButton
+                        component={Link}
+                        to={`/add-product/${product.id}`}
+                        color="primary"
+                      >
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDelete(product.id)}
+                        color="error"
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

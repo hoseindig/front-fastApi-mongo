@@ -6,12 +6,14 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme"; // Import the theme file (we’ll create this next)
+import { ToastContainer } from "react-toastify";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <ThemeProvider theme={theme}>
       <App />
+      <ToastContainer />
     </ThemeProvider>
   </BrowserRouter>
 );
