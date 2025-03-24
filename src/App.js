@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import Login from "./LoginPage";
 import Dashboard from "./DashboardPage";
-import ProductPage from "./ProductPage";
-import AddProductPage from "./AddProductPage";
+import ProductPage from "./Product/ProductPage";
+import AddProductPage from "./Product/AddProductPage";
 import ProtectedRoute from "./ProtectedRoute";
-import CategoryPage from "./CategoryPage";
-import AddCategoryPage from "./AddCategoryPage";
+import CategoryPage from "./Category/CategoryPage";
+import AddCategoryPage from "./Category/AddCategoryPage";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import UserPage from "./User/UsertPage";
+import AddUserPage from "./User/AddUserPage";
 
 const App = () => {
   const location = useLocation(); // Get the current route
@@ -61,11 +63,28 @@ const App = () => {
               <p>
                 <Link to="/categories">Go to Categories</Link>
               </p>
+              <p>
+                <Link to="/user">Go to User</Link>
+              </p>
             </div>
           }
         />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route
+          path="/user"
+          element={<ProtectedRoute element={<UserPage />} />}
+        />
+        <Route
+          path="/add-user"
+          element={<ProtectedRoute element={<AddUserPage />} />}
+        />
+        <Route
+          path="/add-user/:userId?"
+          element={<ProtectedRoute element={<AddUserPage />} />}
+        />
+
         <Route
           path="/products"
           element={<ProtectedRoute element={<ProductPage />} />}
