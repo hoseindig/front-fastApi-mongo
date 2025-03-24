@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Typography } from "@mui/material";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
@@ -51,7 +52,7 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-container">
-      <h2>Welcome to your Dashboard</h2>
+      <Typography variant="h4">Dashboard</Typography>
       <p>Click below to view the products:</p>
       <p>
         <Link to="/products">Go to Products</Link>

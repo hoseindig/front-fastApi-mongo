@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
+
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -78,7 +80,7 @@ const UserPage = () => {
 
   return (
     <div>
-      <h1>User List</h1>
+      <Typography variant="h4">Users</Typography>
       <Link to="/add-user">➕ Add New Users</Link>
       <div>
         {products.length === 0 ? (
